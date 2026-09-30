@@ -1,0 +1,6 @@
+{
+  "name": "SwasthyaGrid AI",
+  "description": "Federated AI platform for predictive healthcare resource management and emergency supply-chain coordination across India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(userId);
+    }
+
+    // Transfer Audits: Human-in-the-Loop Decisions
+    match /transfer_audits/{auditId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if false; // Immutable audit trail
+    }
+
+    // Cloud Backups: System State Checkpoints
+    match /cloud_backups/{backupId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+  }
+}

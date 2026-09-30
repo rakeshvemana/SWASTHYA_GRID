@@ -1,0 +1,69 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Authenticated user profile and assigned administrative role.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["STATE_ADMIN", "DISTRICT_COORDINATOR", "PHC_MEDICAL_OFFICER"] },
+        "assignedDistrict": { "type": "string" },
+        "assignedFacilityId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email", "role"]
+    },
+    "TransferAudit": {
+      "title": "Transfer Audit Log",
+      "description": "Audit record of human approval or rejection of resource transfers.",
+      "type": "object",
+      "properties": {
+        "transferId": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "status": { "type": "string", "enum": ["APPROVED", "REJECTED"] },
+        "sourceFacilityId": { "type": "string" },
+        "targetFacilityId": { "type": "string" },
+        "medicineId": { "type": "string" },
+        "quantity": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      },
+      "required": ["transferId", "approvedBy", "status", "timestamp"]
+    },
+    "CloudBackup": {
+      "title": "Cloud Storage Snapshot",
+      "description": "Encrypted state checkpoint snapshot of the network inventory and forecasts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "hash": { "type": "string" },
+        "recordCount": { "type": "number" },
+        "sizeKb": { "type": "number" },
+        "deviceOrigin": { "type": "string" },
+        "syncLatencyMs": { "type": "number" },
+        "status": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "timestamp", "hash", "recordCount"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles keyed by Firebase Auth UID."
+    },
+    "/transfer_audits/{auditId}": {
+      "schema": "TransferAudit",
+      "description": "Immutable log of human approvals."
+    },
+    "/cloud_backups/{backupId}": {
+      "schema": "CloudBackup",
+      "description": "Stored cloud backup snapshots."
+    }
+  }
+}
